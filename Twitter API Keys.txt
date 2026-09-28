@@ -1,0 +1,16 @@
+Twitter API Keys: prabhudevterani@gmail.com (Chrome Login)
+
+
+API Key
+
+ysU3r5rPGnolO6NIk6MQOGYFU
+
+
+API Key Secret
+
+TM15pNggUpSgooVhpSGWtoVoVEHvCMZ3PHzao4JgpokmoiUuSw
+
+
+Bearer Token
+
+AAAAAAAAAAAAAAAAAAAAAFVulAEAAAAAInwGoi2QNnGGscS7%2FEVdnOTyHk0%3Dbkzqjm9jvenWsX8UAnNfyN7SkPCYCXoYFD6LzyYFZupcSvKEIQ

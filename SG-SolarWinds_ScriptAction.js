@@ -1,0 +1,22 @@
+(function execute(inputs, outputs) {
+  if (gs.getProperty("sn_solarwinds_inte.valid_version") != "true") {
+    throw new Error("Not using a supported SolarWinds version.  Confirm version in guided setup.")
+    return;
+  }
+  var limit = parseInt(parseInt(inputs.Limit) + parseInt(inputs.Offset) -1).toFixed(0);
+  
+  var samInstalled = gs.getProperty("sn_solarwinds_inte.sam_installed");
+  var npmInstalled = gs.getProperty("sn_solarwinds_inte.npm_installed");
+  var comment = "--hardware sam:" + samInstalled + " npm:" + npmInstalled + "\r\n";
+  
+  var emptyFieldQuery = "'' AS ";
+  
+  var nodesSelect = "Nodes.InstanceSiteId, Nodes.NodeID, Nodes.IPAddress, Nodes.IPAddressType, Nodes.DynamicIP, Nodes.Caption, Nodes.Category, Nodes.NodeDescription, Nodes.Description, Nodes.DNS, Nodes.SysName, Nodes.Vendor, Nodes.IOSImage, Nodes.IOSVersion, Nodes.CPUCount, Nodes.MachineType, Nodes.IsServer, Nodes.TotalMemory, Nodes.CMTS, Nodes.IP, Nodes.IP_Address, Nodes.LastSync";
+  
+  var hardwareHealthSelect = ((samInstalled == "true" || npmInstalled == "true") ? "HardwareHealth.Manufacturer, HardwareHealth.Model, HardwareHealth.ServiceTag" : (emptyFieldQuery + "Manufacturer, " + emptyFieldQuery + "Model, " + emptyFieldQuery + "ServiceTag"));
+  
+  var serverInformationSelect = (samInstalled == "true" ? "ServerInformation.HostName" : (emptyFieldQuery + "HostName")) + ", " + (samInstalled == "true" ? "ServerInformation.SystemName" : (emptyFieldQuery + "SystemName")) + ", " + (samInstalled == "true" ? "ServerInformation.Domain" : (emptyFieldQuery + "Domain")) + ", " + (samInstalled == "true" ? "ServerInformation.DNSName" : (emptyFieldQuery + "DNSName")) + ", " + (samInstalled == "true" ? "ServerInformation.DomainRole" : (emptyFieldQuery + "DomainRole")) + ", " + (samInstalled == "true" ? "ServerInformation.AssetType" : (emptyFieldQuery + "AssetType")) + ", " + (samInstalled == "true" ? "ServerInformation.OperatingSystem" : (emptyFieldQuery + "OperatingSystem")) + ", " + (samInstalled == "true" ? "ServerInformation.OSVersion" : (emptyFieldQuery + "OSVersion")) + ", " + (samInstalled == "true" ? "ServerInformation.OSArchitecture" : (emptyFieldQuery + "OSArchitecture")) + ", " + (samInstalled == "true" ? "ServerInformation.ServicePack" : (emptyFieldQuery + "ServicePack")) + ", " + (samInstalled == "true" ? "ServerInformation.OSLanguage" : (emptyFieldQuery + "OSLanguage")) + ", " + (samInstalled == "true" ? "ServerInformation.HardwareSerialNumber" : (emptyFieldQuery + "HardwareSerialNumber")) + ", " + (samInstalled == "true" ? "ServerInformation.ProductNumber" : (emptyFieldQuery + "ProductNumber")) + ", " + (samInstalled == "true" ? "ServerInformation.Manufacturer AS ServerInformationManufacturer" : (emptyFieldQuery + "ServerInformationManufacturer")) + ", " + (samInstalled == "true" ? "ServerInformation.Model AS ServerInformationModel" : (emptyFieldQuery + "ServerInformationModel")) + ", " + (samInstalled == "true" ? "ServerInformation.LastLoggedInUser" : (emptyFieldQuery + "LastLoggedInUser")) + ", " + (samInstalled == "true" ? "ServerInformation.Contact" : (emptyFieldQuery + "Contact")) + ", " + (samInstalled == "true" ? "ServerInformation.ProcessorCount" : (emptyFieldQuery + "ProcessorCount")) + ", " + (samInstalled == "true" ? "ServerInformation.TotalMemoryB" : (emptyFieldQuery + "TotalMemoryB")) + ", " + (samInstalled == "true" ? "ServerInformation.VirtualMemoryB" : (emptyFieldQuery + "VirtualMemoryB")) + ", " + (samInstalled == "true" ? "ServerInformation.PartOfDomain" : (emptyFieldQuery + "PartOfDomain")) + ", " + (samInstalled == "true" ? "ServerInformation.DeviceType" : (emptyFieldQuery + "DeviceType"));
+  
+  outputs.body = JSON.stringify({"query": comment + "SELECT " + nodesSelect + ", " + hardwareHealthSelect + ", " + serverInformationSelect + " FROM Orion.Nodes AS Nodes " + ((samInstalled == "true" || npmInstalled == "true") ? "LEFT OUTER JOIN Orion.HardwareHealth.HardwareInfo AS HardwareHealth ON Nodes.InstanceSiteId = HardwareHealth.InstanceSiteId AND Nodes.NodeId = HardwareHealth.NodeId " : "") + (samInstalled == "true" ? "LEFT OUTER JOIN Orion.AssetInventory.ServerInformation AS ServerInformation ON Nodes.NodeId = ServerInformation.NodeId AND Nodes.InstanceSiteId = ServerInformation.InstanceSiteId" : "") + " ORDER BY InstanceSiteId, NodeID WITH ROWS " + inputs.Offset  + " TO " + limit});
+  
+})(inputs, outputs);
